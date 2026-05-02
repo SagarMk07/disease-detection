@@ -3,6 +3,7 @@ package com.medvision.ai.data.repository
 import android.content.Context
 import android.graphics.BitmapFactory
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.label.ImageLabel
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.medvision.ai.data.model.DetectionResult
@@ -16,7 +17,7 @@ class DetectionRepository(
         val bitmap = BitmapFactory.decodeFile(imagePath) ?: error("Unable to open captured image.")
         val image = InputImage.fromBitmap(bitmap, 0)
         val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
-        val labels = suspendCancellableCoroutine { continuation ->
+        val labels = suspendCancellableCoroutine<List<ImageLabel>> { continuation ->
             labeler.process(image)
                 .addOnSuccessListener { continuation.resume(it) }
                 .addOnFailureListener { continuation.resume(emptyList()) }
