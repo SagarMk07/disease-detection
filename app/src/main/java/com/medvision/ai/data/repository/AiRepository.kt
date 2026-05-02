@@ -5,6 +5,7 @@ import com.medvision.ai.data.model.AnalysisResult
 import com.medvision.ai.network.OpenAiRequest
 import com.medvision.ai.network.OpenAiResponsesService
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
 
 class AiRepository(
     private val service: OpenAiResponsesService,
@@ -28,7 +29,7 @@ class AiRepository(
         val response = service.createResponse(
             request = OpenAiRequest(
                 model = model,
-                input = prompt,
+                input = JsonPrimitive(prompt),
                 text = OpenAiRequest.TextConfig(
                     format = OpenAiRequest.FormatConfig(type = "json_object")
                 )

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 data class ScanUiState(
     val latestImagePath: String? = null,
@@ -40,24 +41,34 @@ class ScanViewModel(
                     error = null
                 )
             }
-            val result = detectionRepository.analyzeImage(imagePath)
+            val result = withTimeoutOrNull(45_000) {
+                detectionRepository.analyzeImage(imagePath)
+            } ?: Result.failure(IllegalStateException("Visual analysis timed out. Please try again with a clearer, well-lit image."))
             val scan = result.getOrNull()
-            if (scan != null) {
-                historyRepository.addHistory(
-                    HistoryItem(
-                        type = HistoryType.SCAN,
-                        imagePath = imagePath,
-                        resultTitle = scan.possibleCondition,
-                        resultDetail = "Confidence ${scan.confidence}%"
-                    )
-                )
-            }
             _uiState.update {
                 it.copy(
                     isLoading = false,
                     result = scan,
                     error = result.exceptionOrNull()?.message
                 )
+            }
+            if (scan != null) {
+                viewModelScope.launch {
+                    historyRepository.addHistory(
+                        HistoryItem(
+                            type = HistoryType.SCAN,
+                            imagePath = imagePath,
+                            resultTitle = scan.possibleCondition,
+                            resultDetail = buildString {
+                                append("Confidence ${scan.confidence}%")
+                                if (scan.summary.isNotBlank()) {
+                                    append("\n")
+                                    append(scan.summary)
+                                }
+                            }
+                        )
+                    )
+                }
             }
         }
     }

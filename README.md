@@ -80,11 +80,21 @@ Add the following values to `local.properties` or your environment:
 
 ```properties
 OPENAI_API_KEY=your_api_key_here
-OPENAI_MODEL=gpt-5.2-mini
+OPENAI_MODEL=gpt-5-mini
 OPENAI_BASE_URL=https://api.openai.com/
 ```
 
 If no API key is provided, the symptom checker returns a sample response instead of calling the API.
+
+### Gemini
+
+Image scanning uses Google AI Studio / Gemini:
+
+```properties
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_BASE_URL=https://generativelanguage.googleapis.com/
+```
 
 ## Build And Run
 

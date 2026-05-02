@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -111,9 +112,11 @@ fun ScanScreen(
                 AsyncImage(
                     model = imagePath,
                     contentDescription = "Captured image",
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(220.dp)
+                        .padding(12.dp)
                 )
             }
         }
@@ -125,6 +128,9 @@ fun ScanScreen(
                 ) {
                     Text("Possible condition: ${result.possibleCondition}", style = MaterialTheme.typography.titleLarge)
                     Text("Confidence: ${result.confidence}%")
+                    if (result.summary.isNotBlank()) {
+                        Text(result.summary, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
             DisclaimerBanner(text = result.disclaimer)

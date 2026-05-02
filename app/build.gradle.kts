@@ -36,8 +36,11 @@ android {
         }
 
         buildConfigField("String", "OPENAI_API_KEY", "\"${propertyOrEnv("OPENAI_API_KEY")}\"")
-        buildConfigField("String", "OPENAI_MODEL", "\"${propertyOrEnv("OPENAI_MODEL").ifBlank { "gpt-5.2-mini" }}\"")
+        buildConfigField("String", "OPENAI_MODEL", "\"${propertyOrEnv("OPENAI_MODEL").ifBlank { "gpt-5-mini" }}\"")
         buildConfigField("String", "OPENAI_BASE_URL", "\"${propertyOrEnv("OPENAI_BASE_URL").ifBlank { "https://api.openai.com/" }}\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"${propertyOrEnv("GEMINI_API_KEY")}\"")
+        buildConfigField("String", "GEMINI_MODEL", "\"${propertyOrEnv("GEMINI_MODEL").ifBlank { "gemini-2.5-flash" }}\"")
+        buildConfigField("String", "GEMINI_BASE_URL", "\"${propertyOrEnv("GEMINI_BASE_URL").ifBlank { "https://generativelanguage.googleapis.com/" }}\"")
         buildConfigField("String", "FIREBASE_API_KEY", "\"${propertyOrEnv("FIREBASE_API_KEY")}\"")
         buildConfigField("String", "FIREBASE_APP_ID", "\"${propertyOrEnv("FIREBASE_APP_ID")}\"")
         buildConfigField("String", "FIREBASE_PROJECT_ID", "\"${propertyOrEnv("FIREBASE_PROJECT_ID")}\"")

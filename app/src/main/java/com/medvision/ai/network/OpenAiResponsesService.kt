@@ -2,6 +2,7 @@ package com.medvision.ai.network
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -13,7 +14,7 @@ interface OpenAiResponsesService {
 @Serializable
 data class OpenAiRequest(
     val model: String,
-    val input: String,
+    val input: JsonElement,
     val text: TextConfig? = null
 ) {
     @Serializable
