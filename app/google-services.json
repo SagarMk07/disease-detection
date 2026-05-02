@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1005849323777",
+    "project_id": "android-dd-fa291",
+    "storage_bucket": "android-dd-fa291.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005849323777:android:8ba27f5d61efea8e1ed300",
+        "android_client_info": {
+          "package_name": "com.medvision.ai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjwV-OM-DRnrA2iYyOAwIhdzSmdFtAcWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
