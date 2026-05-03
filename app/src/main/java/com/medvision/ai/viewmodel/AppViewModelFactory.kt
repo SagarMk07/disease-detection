@@ -23,6 +23,8 @@ class AppViewModelFactory(
                 HistoryViewModel(container.historyRepository) as T
             modelClass.isAssignableFrom(ScanViewModel::class.java) ->
                 ScanViewModel(container.detectionRepository, container.historyRepository) as T
+            modelClass.isAssignableFrom(ScanComparisonViewModel::class.java) ->
+                ScanComparisonViewModel(container.detectionRepository, container.historyRepository) as T
             modelClass.isAssignableFrom(MedicalChatViewModel::class.java) ->
                 MedicalChatViewModel(container.medicalChatRepository) as T
             modelClass.isAssignableFrom(SettingsViewModel::class.java) ->

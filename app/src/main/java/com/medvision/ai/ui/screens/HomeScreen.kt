@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Compare
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material3.Icon
@@ -36,6 +37,7 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onOpenSymptoms: () -> Unit,
     onOpenScan: () -> Unit,
+    onOpenComparison: () -> Unit,
     onOpenChat: () -> Unit,
     onOpenHistory: () -> Unit
 ) {
@@ -43,6 +45,7 @@ fun HomeScreen(
     val cards = listOf(
         Triple("Symptom Checker", Icons.Default.Psychology, onOpenSymptoms),
         Triple("Scan Disease", Icons.Default.CameraAlt, onOpenScan),
+        Triple("Scan Comparison", Icons.Default.Compare, onOpenComparison),
         Triple("AI Health Chat", Icons.Default.Chat, onOpenChat),
         Triple("Health History", Icons.Default.MonitorHeart, onOpenHistory)
     )
@@ -109,6 +112,7 @@ private fun GlassActionCard(
                     text = when (title) {
                         "Symptom Checker" -> "Type symptoms and receive AI-generated condition possibilities."
                         "Scan Disease" -> "Capture an image and run visual pattern analysis."
+                        "Scan Comparison" -> "Compare earlier and newer images to track visible changes."
                         "AI Health Chat" -> "Ask follow-up questions about symptoms, care steps, and medicine safety."
                         else -> "Review your past symptom checks and scans."
                     },

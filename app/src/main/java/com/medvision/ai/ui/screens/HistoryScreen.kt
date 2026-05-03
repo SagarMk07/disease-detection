@@ -54,7 +54,11 @@ fun HistoryScreen(viewModel: HistoryViewModel) {
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
-                            text = if (item.type == HistoryType.SYMPTOM) "Symptom analysis" else "Scan analysis",
+                            text = when (item.type) {
+                                HistoryType.SYMPTOM -> "Symptom analysis"
+                                HistoryType.SCAN -> "Scan analysis"
+                                HistoryType.COMPARISON -> "Scan comparison"
+                            },
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(formatTimestamp(item.timestamp), color = MaterialTheme.colorScheme.primary)

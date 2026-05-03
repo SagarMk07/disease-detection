@@ -7,3 +7,11 @@ data class DetectionResult(
     val summary: String = "",
     val disclaimer: String = APP_DISCLAIMER
 )
+
+data class ScanComparisonResult(
+    val trend: String,
+    val confidence: Int,
+    val summary: String,
+    val suggestedAction: String,
+    val disclaimer: String = APP_DISCLAIMER
+)

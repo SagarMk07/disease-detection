@@ -34,6 +34,7 @@ import com.medvision.ai.ui.screens.AuthScreen
 import com.medvision.ai.ui.screens.HistoryScreen
 import com.medvision.ai.ui.screens.HomeScreen
 import com.medvision.ai.ui.screens.MedicalChatScreen
+import com.medvision.ai.ui.screens.ScanComparisonScreen
 import com.medvision.ai.ui.screens.ScanScreen
 import com.medvision.ai.ui.screens.SettingsScreen
 import com.medvision.ai.ui.screens.SymptomCheckerScreen
@@ -42,6 +43,7 @@ import com.medvision.ai.viewmodel.AuthViewModel
 import com.medvision.ai.viewmodel.HistoryViewModel
 import com.medvision.ai.viewmodel.HomeViewModel
 import com.medvision.ai.viewmodel.MedicalChatViewModel
+import com.medvision.ai.viewmodel.ScanComparisonViewModel
 import com.medvision.ai.viewmodel.ScanViewModel
 import com.medvision.ai.viewmodel.SettingsViewModel
 import com.medvision.ai.viewmodel.SymptomCheckerViewModel
@@ -55,6 +57,7 @@ fun MedVisionApp(application: Application) {
     val homeViewModel: HomeViewModel = viewModel(factory = factory)
     val symptomViewModel: SymptomCheckerViewModel = viewModel(factory = factory)
     val scanViewModel: ScanViewModel = viewModel(factory = factory)
+    val scanComparisonViewModel: ScanComparisonViewModel = viewModel(factory = factory)
     val medicalChatViewModel: MedicalChatViewModel = viewModel(factory = factory)
     val historyViewModel: HistoryViewModel = viewModel(factory = factory)
     val settingsViewModel: SettingsViewModel = viewModel(factory = factory)
@@ -117,6 +120,7 @@ fun MedVisionApp(application: Application) {
                         homeViewModel = homeViewModel,
                         symptomViewModel = symptomViewModel,
                         scanViewModel = scanViewModel,
+                        scanComparisonViewModel = scanComparisonViewModel,
                         medicalChatViewModel = medicalChatViewModel,
                         historyViewModel = historyViewModel,
                         settingsViewModel = settingsViewModel
@@ -134,6 +138,7 @@ private fun MedVisionNavHost(
     homeViewModel: HomeViewModel,
     symptomViewModel: SymptomCheckerViewModel,
     scanViewModel: ScanViewModel,
+    scanComparisonViewModel: ScanComparisonViewModel,
     medicalChatViewModel: MedicalChatViewModel,
     historyViewModel: HistoryViewModel,
     settingsViewModel: SettingsViewModel
@@ -148,6 +153,7 @@ private fun MedVisionNavHost(
                 viewModel = homeViewModel,
                 onOpenSymptoms = { navController.navigate("symptoms") },
                 onOpenScan = { navController.navigate("scan") },
+                onOpenComparison = { navController.navigate("scan_comparison") },
                 onOpenChat = { navController.navigate("medical_chat") },
                 onOpenHistory = { navController.navigate("history") }
             )
@@ -161,6 +167,12 @@ private fun MedVisionNavHost(
         composable("scan") {
             ScanScreen(
                 viewModel = scanViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable("scan_comparison") {
+            ScanComparisonScreen(
+                viewModel = scanComparisonViewModel,
                 onBack = { navController.popBackStack() }
             )
         }

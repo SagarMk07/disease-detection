@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import com.medvision.ai.data.model.DetectionResult
+import com.medvision.ai.data.model.ScanComparisonResult
 import com.medvision.ai.network.GeminiContent
 import com.medvision.ai.network.GeminiGenerationConfig
 import com.medvision.ai.network.GeminiInlineData
@@ -28,6 +29,17 @@ class DetectionRepository(
     suspend fun analyzeImage(imagePath: String): Result<DetectionResult> {
         return try {
             Result.success(analyzeImageWithOpenAi(imagePath))
+        } catch (exception: Exception) {
+            Result.failure(IllegalStateException(exception.toFriendlyAnalysisMessage(), exception))
+        }
+    }
+
+    suspend fun compareImages(
+        earlierImagePath: String,
+        newerImagePath: String
+    ): Result<ScanComparisonResult> {
+        return try {
+            Result.success(compareImagesWithGemini(earlierImagePath, newerImagePath))
         } catch (exception: Exception) {
             Result.failure(IllegalStateException(exception.toFriendlyAnalysisMessage(), exception))
         }
@@ -92,6 +104,77 @@ class DetectionRepository(
         )
     }
 
+    private suspend fun compareImagesWithGemini(
+        earlierImagePath: String,
+        newerImagePath: String
+    ): ScanComparisonResult {
+        val earlierBitmap = BitmapFactory.decodeFile(earlierImagePath) ?: error("Unable to open earlier image.")
+        val newerBitmap = BitmapFactory.decodeFile(newerImagePath) ?: error("Unable to open newer image.")
+
+        if (apiKey.isBlank()) {
+            return ScanComparisonResult(
+                trend = "Unclear",
+                confidence = 0,
+                summary = "Add a Gemini API key to compare scan images.",
+                suggestedAction = "Add GEMINI_API_KEY in local.properties and rebuild the app."
+            )
+        }
+
+        val prompt = """
+            You are comparing two user-submitted health images of the same concern over time.
+            The first image is earlier. The second image is newer.
+            Do not diagnose. Do not claim certainty.
+            Compare visible changes only, such as redness, swelling, spread, dryness, irritation, eye redness, or image quality.
+            Return trend as exactly one of: Improving, Worsening, Unclear.
+            If lighting, angle, focus, body part, or image quality makes comparison unreliable, choose Unclear.
+            Respond only in JSON with keys:
+            trend (string), confidence (integer 0-100), summary (string), suggested_action (string)
+        """.trimIndent()
+
+        val response = service.generateContent(
+            model = model,
+            apiKey = apiKey,
+            request = GeminiRequest(
+                contents = listOf(
+                    GeminiContent(
+                        parts = listOf(
+                            GeminiPart(text = prompt),
+                            GeminiPart(
+                                inlineData = GeminiInlineData(
+                                    mimeType = "image/jpeg",
+                                    data = earlierBitmap.toJpegBase64()
+                                )
+                            ),
+                            GeminiPart(
+                                inlineData = GeminiInlineData(
+                                    mimeType = "image/jpeg",
+                                    data = newerBitmap.toJpegBase64()
+                                )
+                            )
+                        )
+                    )
+                ),
+                generationConfig = GeminiGenerationConfig(
+                    responseMimeType = "application/json"
+                )
+            )
+        )
+
+        val rawText = response.candidates.orEmpty()
+            .flatMap { it.content?.parts.orEmpty() }
+            .firstOrNull { !it.text.isNullOrBlank() }
+            ?.text
+            ?: error("Gemini returned an empty image comparison.")
+
+        val parsed = json.decodeFromString<VisualComparisonResponse>(rawText)
+        return ScanComparisonResult(
+            trend = parsed.trend.toSupportedTrend(),
+            confidence = parsed.confidence.coerceIn(0, 100),
+            summary = parsed.summary,
+            suggestedAction = parsed.suggestedAction
+        )
+    }
+
     private fun Bitmap.toJpegBase64(): String {
         val scaled = scaleForAnalysis()
         val output = ByteArrayOutputStream()
@@ -139,3 +222,19 @@ private data class VisualAnalysisResponse(
     val confidence: Int,
     val summary: String = ""
 )
+
+@Serializable
+private data class VisualComparisonResponse(
+    val trend: String,
+    val confidence: Int,
+    val summary: String = "",
+    @SerialName("suggested_action") val suggestedAction: String = ""
+)
+
+private fun String.toSupportedTrend(): String {
+    return when (trim().lowercase()) {
+        "improving" -> "Improving"
+        "worsening" -> "Worsening"
+        else -> "Unclear"
+    }
+}

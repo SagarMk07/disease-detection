@@ -12,5 +12,6 @@ data class HistoryItem(
 
 enum class HistoryType {
     SYMPTOM,
-    SCAN
+    SCAN,
+    COMPARISON
 }
