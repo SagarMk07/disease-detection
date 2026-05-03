@@ -1,6 +1,7 @@
 package com.medvision.ai.ui.components
 
 import android.content.Context
+import android.net.Uri
 import android.util.Size
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -17,6 +18,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -88,4 +90,28 @@ fun capturePhoto(
             }
         }
     )
+}
+
+fun copyGalleryImageToCache(
+    context: Context,
+    uri: Uri,
+    onSuccess: (String) -> Unit,
+    onError: (String) -> Unit
+) {
+    val file = File(
+        context.cacheDir,
+        "medvision_gallery_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.jpg"
+    )
+
+    try {
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        } ?: throw IOException("Unable to open selected image.")
+        onSuccess(file.absolutePath)
+    } catch (exception: Exception) {
+        file.delete()
+        onError(exception.message ?: "Unable to import selected image.")
+    }
 }

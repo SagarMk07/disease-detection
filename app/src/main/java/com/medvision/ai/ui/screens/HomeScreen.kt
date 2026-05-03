@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material3.Icon
@@ -36,12 +37,14 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onOpenSymptoms: () -> Unit,
     onOpenScan: () -> Unit,
+    onOpenChat: () -> Unit,
     onOpenHistory: () -> Unit
 ) {
     val user by viewModel.user.collectAsState()
     val cards = listOf(
         Triple("Symptom Checker", Icons.Default.Psychology, onOpenSymptoms),
         Triple("Scan Disease", Icons.Default.CameraAlt, onOpenScan),
+        Triple("AI Health Chat", Icons.Default.Chat, onOpenChat),
         Triple("Health History", Icons.Default.MonitorHeart, onOpenHistory)
     )
     val accent by animateColorAsState(targetValue = Color(0xFF86D8FF), label = "accent")
@@ -107,6 +110,7 @@ private fun GlassActionCard(
                     text = when (title) {
                         "Symptom Checker" -> "Type symptoms and receive AI-generated condition possibilities."
                         "Scan Disease" -> "Capture an image and run visual pattern analysis."
+                        "AI Health Chat" -> "Ask follow-up questions about symptoms, care steps, and medicine safety."
                         else -> "Review your past symptom checks and scans."
                     },
                     style = MaterialTheme.typography.bodyMedium,

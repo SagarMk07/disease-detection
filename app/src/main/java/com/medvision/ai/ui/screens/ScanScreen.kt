@@ -14,9 +14,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +40,7 @@ import com.medvision.ai.ui.components.LoadingCard
 import com.medvision.ai.ui.components.PrimaryActionButton
 import com.medvision.ai.ui.components.ScreenHeader
 import com.medvision.ai.ui.components.capturePhoto
+import com.medvision.ai.ui.components.copyGalleryImageToCache
 import com.medvision.ai.viewmodel.ScanViewModel
 
 @Composable
@@ -53,6 +56,18 @@ fun ScanScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted -> hasPermission = granted }
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            copyGalleryImageToCache(
+                context = context,
+                uri = it,
+                onSuccess = viewModel::analyzeImage,
+                onError = viewModel::setError
+            )
+        }
+    }
 
     LaunchedEffect(Unit) {
         permissionLauncher.launch(Manifest.permission.CAMERA)
@@ -98,6 +113,17 @@ fun ScanScreen(
                     )
                 } else {
                     Text("Camera permission is required to scan images.", color = MaterialTheme.colorScheme.error)
+                }
+                OutlinedButton(
+                    onClick = { galleryLauncher.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.isLoading
+                ) {
+                    Icon(Icons.Default.PhotoLibrary, contentDescription = null)
+                    Text(
+                        text = "Upload from Gallery",
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
                 }
                 state.error?.let {
                     Text(text = it, color = MaterialTheme.colorScheme.error)

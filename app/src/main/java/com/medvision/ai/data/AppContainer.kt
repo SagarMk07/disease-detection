@@ -9,6 +9,7 @@ import com.medvision.ai.data.repository.AiRepository
 import com.medvision.ai.data.repository.AuthRepository
 import com.medvision.ai.data.repository.DetectionRepository
 import com.medvision.ai.data.repository.HistoryRepository
+import com.medvision.ai.data.repository.MedicalChatRepository
 import com.medvision.ai.data.repository.SettingsRepository
 import com.medvision.ai.network.GeminiServiceFactory
 import com.medvision.ai.network.OpenAiServiceFactory
@@ -33,6 +34,13 @@ class AppContainer(context: Context) {
     )
     val detectionRepository = DetectionRepository(
         context = appContext,
+        service = GeminiServiceFactory.create(
+            baseUrl = BuildConfig.GEMINI_BASE_URL
+        ),
+        model = BuildConfig.GEMINI_MODEL,
+        apiKey = BuildConfig.GEMINI_API_KEY
+    )
+    val medicalChatRepository = MedicalChatRepository(
         service = GeminiServiceFactory.create(
             baseUrl = BuildConfig.GEMINI_BASE_URL
         ),
