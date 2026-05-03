@@ -28,7 +28,7 @@ class DetectionRepository(
 
     suspend fun analyzeImage(imagePath: String): Result<DetectionResult> {
         return try {
-            Result.success(analyzeImageWithOpenAi(imagePath))
+            Result.success(analyzeImageWithGemini(imagePath))
         } catch (exception: Exception) {
             Result.failure(IllegalStateException(exception.toFriendlyAnalysisMessage(), exception))
         }
@@ -45,7 +45,7 @@ class DetectionRepository(
         }
     }
 
-    private suspend fun analyzeImageWithOpenAi(imagePath: String): DetectionResult {
+    private suspend fun analyzeImageWithGemini(imagePath: String): DetectionResult {
         val originalBitmap = BitmapFactory.decodeFile(imagePath) ?: error("Unable to open captured image.")
 
         if (apiKey.isBlank()) {

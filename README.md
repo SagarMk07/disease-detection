@@ -50,7 +50,6 @@ This app is intended for general health information and visual triage support. I
 - Retrofit
 - Kotlinx Serialization
 - Google Gemini API
-- OpenAI API support for symptom checker
 - CameraX
 - Coil
 - Lottie Compose
@@ -82,7 +81,7 @@ The symptom checker accepts natural-language symptoms and returns:
 - Risk level
 - Suggested actions
 
-If no OpenAI API key is configured, the app returns a simple sample response so the screen still works during development.
+If no Gemini API key is configured, the app returns a simple sample response so the screen still works during development.
 
 ### Disease Scan
 
@@ -156,22 +155,12 @@ If Firebase is unavailable, the app falls back to local demo-friendly auth/histo
 
 ### Gemini
 
-Gemini powers image scan, scan comparison, and AI Health Chat.
+Gemini powers symptom checking, image scan, scan comparison, and AI Health Chat.
 
 ```properties
 GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-2.5-flash
 GEMINI_BASE_URL=https://generativelanguage.googleapis.com/
-```
-
-### OpenAI
-
-The symptom checker repository supports OpenAI Responses API.
-
-```properties
-OPENAI_API_KEY=your_openai_api_key_here
-OPENAI_MODEL=gpt-5-mini
-OPENAI_BASE_URL=https://api.openai.com/
 ```
 
 ## Build And Run

@@ -1,5 +1,7 @@
 package com.medvision.ai.ui.screens
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,18 +10,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.medvision.ai.ui.components.DisclaimerBanner
 import com.medvision.ai.ui.components.GlassCard
 import com.medvision.ai.ui.components.LoadingCard
@@ -32,7 +34,7 @@ fun SymptomCheckerScreen(
     viewModel: SymptomCheckerViewModel,
     onBack: () -> Unit
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -42,7 +44,7 @@ fun SymptomCheckerScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         IconButton(onClick = onBack) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
         }
         ScreenHeader(
             title = "AI Symptom Checker",
@@ -58,20 +60,35 @@ fun SymptomCheckerScreen(
                     onValueChange = viewModel::updateSymptoms,
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("Symptoms") },
-                    minLines = 5
+                    minLines = 5,
+                    enabled = !state.isLoading
                 )
-                state.error?.let {
-                    Text(text = it, color = MaterialTheme.colorScheme.error)
+                AnimatedVisibility(visible = state.error != null) {
+                    Text(
+                        text = state.error.orEmpty(),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                AnimatedVisibility(visible = state.statusMessage != null && !state.isLoading) {
+                    Text(
+                        text = state.statusMessage.orEmpty(),
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
                 PrimaryActionButton(
-                    text = "Analyze",
+                    text = if (state.isLoading) "Analyzing..." else "Analyze",
                     onClick = viewModel::analyze,
-                    enabled = !state.isLoading
+                    enabled = !state.isLoading && state.symptoms.isNotBlank()
                 )
             }
         }
-        if (state.isLoading) {
-            LoadingCard(message = "Analyzing your symptoms with AI...")
+        AnimatedVisibility(visible = state.isLoading) {
+            AnimatedContent(
+                targetState = state.statusMessage ?: "Analyzing...",
+                label = "symptomLoadingMessage"
+            ) { message ->
+                LoadingCard(message = message)
+            }
         }
         state.result?.let { result ->
             GlassCard(modifier = Modifier.fillMaxWidth()) {
@@ -79,8 +96,12 @@ fun SymptomCheckerScreen(
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Text("Possible conditions", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    Text(result.conditions.joinToString(separator = "\n• ", prefix = "• "))
+                    Text(
+                        "Possible conditions",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(result.conditions.joinToString(separator = "\n- ", prefix = "- "))
                     Text("Risk level: ${result.riskLevel}", color = MaterialTheme.colorScheme.primary)
                     Text("Suggested actions: ${result.advice}")
                 }

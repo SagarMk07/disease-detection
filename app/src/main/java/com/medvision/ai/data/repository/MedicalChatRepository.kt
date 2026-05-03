@@ -72,7 +72,7 @@ class MedicalChatRepository(
     }
 
     private fun Exception.toFriendlyChatMessage(): String {
-        val httpException = this as? HttpException
+        val httpException = findHttpException()
         val errorBody = httpException?.response()?.errorBody()?.string().orEmpty()
         return when {
             errorBody.contains("API_KEY_INVALID", ignoreCase = true) ||
@@ -80,13 +80,24 @@ class MedicalChatRepository(
                 "Gemini API key is invalid. Add a fresh key in local.properties and rebuild the app."
             httpException?.code() == 429 || errorBody.contains("quota", ignoreCase = true) ->
                 "Gemini quota is exhausted for this API key. Try again later or use another key."
-            httpException != null && errorBody.isNotBlank() ->
-                "Gemini chat failed (${httpException.code()}): ${errorBody.take(220)}"
+            httpException?.code() == 503 || errorBody.contains("UNAVAILABLE", ignoreCase = true) ->
+                "Server is busy. Please try again in a moment."
             httpException != null ->
                 "Gemini chat failed (${httpException.code()}). Check the model name and API key."
             message.isNullOrBlank() -> "AI chat failed. Please try again."
             else -> message.orEmpty()
         }
+    }
+
+    private fun Throwable.findHttpException(): HttpException? {
+        var current: Throwable? = this
+        while (current != null) {
+            if (current is HttpException) {
+                return current
+            }
+            current = current.cause
+        }
+        return null
     }
 }
 

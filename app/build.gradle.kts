@@ -13,8 +13,16 @@ val localProperties = Properties().apply {
     }
 }
 
+val dotEnvProperties = Properties().apply {
+    val file = rootProject.file(".env")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
+}
+
 fun propertyOrEnv(name: String): String {
     return localProperties.getProperty(name)
+        ?: dotEnvProperties.getProperty(name)
         ?: System.getenv(name)
         ?: ""
 }
@@ -35,9 +43,6 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "OPENAI_API_KEY", "\"${propertyOrEnv("OPENAI_API_KEY")}\"")
-        buildConfigField("String", "OPENAI_MODEL", "\"${propertyOrEnv("OPENAI_MODEL").ifBlank { "gpt-5-mini" }}\"")
-        buildConfigField("String", "OPENAI_BASE_URL", "\"${propertyOrEnv("OPENAI_BASE_URL").ifBlank { "https://api.openai.com/" }}\"")
         buildConfigField("String", "GEMINI_API_KEY", "\"${propertyOrEnv("GEMINI_API_KEY")}\"")
         buildConfigField("String", "GEMINI_MODEL", "\"${propertyOrEnv("GEMINI_MODEL").ifBlank { "gemini-2.5-flash" }}\"")
         buildConfigField("String", "GEMINI_BASE_URL", "\"${propertyOrEnv("GEMINI_BASE_URL").ifBlank { "https://generativelanguage.googleapis.com/" }}\"")

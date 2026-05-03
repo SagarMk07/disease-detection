@@ -1,10 +1,6 @@
 package com.medvision.ai.ui
 
 import android.app.Application
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -70,62 +66,56 @@ fun MedVisionApp(application: Application) {
     )
 
     GradientBackground {
-        AnimatedContent(
-            targetState = authState.user != null,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
-            label = "root_switch"
-        ) { signedIn ->
-            if (!signedIn) {
-                AuthScreen(
-                    state = authState,
-                    onEmailChange = authViewModel::updateEmail,
-                    onPasswordChange = authViewModel::updatePassword,
-                    onNameChange = authViewModel::updateName,
-                    onToggleMode = authViewModel::toggleMode,
-                    onSubmit = authViewModel::submit
-                )
-            } else {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    containerColor = androidx.compose.ui.graphics.Color.Transparent,
-                    bottomBar = {
-                        val backStackEntry by navController.currentBackStackEntryAsState()
-                        val currentDestination = backStackEntry?.destination
-                        val showBottomBar = currentDestination?.route in items.map { it.route }
-                        if (showBottomBar) {
-                            NavigationBar(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f)) {
-                                items.forEach { item ->
-                                    NavigationBarItem(
-                                        selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
-                                        onClick = {
-                                            navController.navigate(item.route) {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
-                                                }
-                                                launchSingleTop = true
-                                                restoreState = true
+        if (authState.user == null) {
+            AuthScreen(
+                state = authState,
+                onEmailChange = authViewModel::updateEmail,
+                onPasswordChange = authViewModel::updatePassword,
+                onNameChange = authViewModel::updateName,
+                onToggleMode = authViewModel::toggleMode,
+                onSubmit = authViewModel::submit
+            )
+        } else {
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                containerColor = androidx.compose.ui.graphics.Color.Transparent,
+                bottomBar = {
+                    val backStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = backStackEntry?.destination
+                    val showBottomBar = currentDestination?.route in items.map { it.route }
+                    if (showBottomBar) {
+                        NavigationBar(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f)) {
+                            items.forEach { item ->
+                                NavigationBarItem(
+                                    selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
+                                    onClick = {
+                                        navController.navigate(item.route) {
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
                                             }
-                                        },
-                                        icon = { Icon(item.icon, contentDescription = item.label) },
-                                        label = { Text(item.label) }
-                                    )
-                                }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    },
+                                    icon = { Icon(item.icon, contentDescription = item.label) },
+                                    label = { Text(item.label) }
+                                )
                             }
                         }
                     }
-                ) { padding ->
-                    MedVisionNavHost(
-                        navController = navController,
-                        padding = padding,
-                        homeViewModel = homeViewModel,
-                        symptomViewModel = symptomViewModel,
-                        scanViewModel = scanViewModel,
-                        scanComparisonViewModel = scanComparisonViewModel,
-                        medicalChatViewModel = medicalChatViewModel,
-                        historyViewModel = historyViewModel,
-                        settingsViewModel = settingsViewModel
-                    )
                 }
+            ) { padding ->
+                MedVisionNavHost(
+                    navController = navController,
+                    padding = padding,
+                    homeViewModel = homeViewModel,
+                    symptomViewModel = symptomViewModel,
+                    scanViewModel = scanViewModel,
+                    scanComparisonViewModel = scanComparisonViewModel,
+                    medicalChatViewModel = medicalChatViewModel,
+                    historyViewModel = historyViewModel,
+                    settingsViewModel = settingsViewModel
+                )
             }
         }
     }
@@ -146,7 +136,9 @@ private fun MedVisionNavHost(
     NavHost(
         navController = navController,
         startDestination = "home",
-        modifier = Modifier.padding(padding)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
     ) {
         composable("home") {
             HomeScreen(

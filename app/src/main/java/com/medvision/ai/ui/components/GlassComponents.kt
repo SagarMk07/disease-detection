@@ -28,8 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
@@ -60,8 +58,6 @@ fun GradientBackground(content: @Composable () -> Unit) {
             Color(0xFFFFFFFF)
         )
     }
-    val glowColor = if (isDark) Color(0xFF65C7F7) else Color(0xFFB9E3FF)
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -71,18 +67,6 @@ fun GradientBackground(content: @Composable () -> Unit) {
                 )
             )
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .alpha(0.35f)
-                .blur(60.dp)
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(glowColor, Color.Transparent),
-                        radius = 900f
-                    )
-                )
-        )
         content()
     }
 }

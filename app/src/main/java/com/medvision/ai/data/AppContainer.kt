@@ -12,7 +12,6 @@ import com.medvision.ai.data.repository.HistoryRepository
 import com.medvision.ai.data.repository.MedicalChatRepository
 import com.medvision.ai.data.repository.SettingsRepository
 import com.medvision.ai.network.GeminiServiceFactory
-import com.medvision.ai.network.OpenAiServiceFactory
 
 class AppContainer(context: Context) {
     private val appContext = context.applicationContext
@@ -25,12 +24,12 @@ class AppContainer(context: Context) {
     val authRepository = AuthRepository(auth)
     val historyRepository = HistoryRepository(firestore, authRepository)
     val aiRepository = AiRepository(
-        service = OpenAiServiceFactory.create(
-            baseUrl = BuildConfig.OPENAI_BASE_URL,
-            apiKey = BuildConfig.OPENAI_API_KEY
+        context = appContext,
+        service = GeminiServiceFactory.create(
+            baseUrl = BuildConfig.GEMINI_BASE_URL
         ),
-        model = BuildConfig.OPENAI_MODEL,
-        apiKey = BuildConfig.OPENAI_API_KEY
+        model = BuildConfig.GEMINI_MODEL,
+        apiKey = BuildConfig.GEMINI_API_KEY
     )
     val detectionRepository = DetectionRepository(
         context = appContext,

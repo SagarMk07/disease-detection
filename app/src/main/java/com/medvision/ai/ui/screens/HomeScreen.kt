@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Compare
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Psychology
@@ -46,7 +46,7 @@ fun HomeScreen(
         Triple("Symptom Checker", Icons.Default.Psychology, onOpenSymptoms),
         Triple("Scan Disease", Icons.Default.CameraAlt, onOpenScan),
         Triple("Scan Comparison", Icons.Default.Compare, onOpenComparison),
-        Triple("AI Health Chat", Icons.Default.Chat, onOpenChat),
+        Triple("AI Health Chat", Icons.AutoMirrored.Filled.Chat, onOpenChat),
         Triple("Health History", Icons.Default.MonitorHeart, onOpenHistory)
     )
     val accent by animateColorAsState(targetValue = MaterialTheme.colorScheme.primary, label = "accent")
