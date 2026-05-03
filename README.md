@@ -1,30 +1,42 @@
 # MedVision AI
 
-MedVision AI is a modern Android health assistant built with Kotlin and Jetpack Compose. It combines Firebase-ready authentication, AI-assisted symptom analysis, camera-based image scanning, and a premium glassmorphism-inspired UI.
+MedVision AI is a Kotlin and Jetpack Compose Android health assistant. It combines authentication, AI symptom analysis, Gemini-powered image scanning, scan comparison, medical chat, health history, and a responsive light/dark Material 3 interface.
 
-## Overview
-
-The app is designed around MVVM and clean separation of concerns:
-
-- `data/` contains models and repositories
-- `network/` handles OpenAI API communication
-- `ui/` contains Compose screens, theme, and shared components
-- `viewmodel/` manages screen state with `StateFlow`
-- `utils/` contains small helper functions
+This app is intended for general health information and visual triage support. It does not diagnose, prescribe medicine, or replace a licensed medical professional.
 
 ## Features
 
 - Email/password login and signup
-- Session-aware authentication flow
-- Premium home screen with animated glass cards
-- AI symptom checker with OpenAI integration
-- Sample AI fallback when no API key is configured
-- CameraX capture flow for disease image scanning
-- ML Kit-based placeholder visual detection
+- Firebase-ready authentication
+- Local demo fallback when Firebase is unavailable
+- Home dashboard with quick access cards
+- AI symptom checker
+- Gemini-powered disease image scan
+- Camera capture for scan analysis
+- Upload from gallery for scan analysis
+- Gemini-powered scan comparison
+- Compare earlier and newer skin/eye images
+- Comparison results: `Improving`, `Worsening`, or `Unclear`
+- Gemini-powered AI Health Chat
+- Medical chatbot for symptoms, care steps, medicine safety questions, and red flags
 - Firestore-backed health history timeline
-- Dark mode toggle
-- Logout and about section
-- Medical disclaimer displayed inside the app
+- History entries for symptom checks, scans, and scan comparisons
+- Settings screen with logout and theme toggle
+- Working light and dark mode
+- Theme-aware status/navigation bar icons
+- 16 KB page-size compatible native libraries
+- Medical disclaimer shown across health workflows
+
+## Main Screens
+
+- **Authentication**: Login and signup.
+- **Home**: Entry point for symptom checking, scanning, scan comparison, AI chat, and history.
+- **AI Symptom Checker**: Type symptoms and receive possible conditions, risk level, and suggested actions.
+- **Disease Scan**: Capture an image with CameraX or upload one from gallery, then analyze it with Gemini.
+- **Scan Comparison**: Select an earlier image and a newer image to track visible changes over time.
+- **AI Health Chat**: Ask follow-up medical questions in a chat interface powered by Gemini.
+- **Health History**: Review past symptom checks, scan results, and comparison results.
+- **Settings**: Toggle dark mode, read app info, and logout.
 
 ## Tech Stack
 
@@ -32,14 +44,17 @@ The app is designed around MVVM and clean separation of concerns:
 - Jetpack Compose
 - Material 3
 - MVVM
+- StateFlow
 - Firebase Auth
 - Firebase Firestore
 - Retrofit
 - Kotlinx Serialization
-- Coil
+- Google Gemini API
+- OpenAI API support for symptom checker
 - CameraX
-- ML Kit
+- Coil
 - Lottie Compose
+- Android DataStore
 
 ## Project Structure
 
@@ -57,13 +72,72 @@ app/src/main/java/com/medvision/ai
 `-- viewmodel
 ```
 
+## AI Capabilities
+
+### Symptom Checker
+
+The symptom checker accepts natural-language symptoms and returns:
+
+- Possible conditions
+- Risk level
+- Suggested actions
+
+If no OpenAI API key is configured, the app returns a simple sample response so the screen still works during development.
+
+### Disease Scan
+
+The scan flow supports:
+
+- Camera capture
+- Gallery upload
+- Gemini image analysis
+- Preview of the analyzed image
+- Result summary and confidence
+- History saving
+
+Gemini is prompted to provide broad visual triage only. It is instructed not to diagnose or claim certainty.
+
+### Scan Comparison
+
+The scan comparison flow supports:
+
+- Earlier image selection
+- Newer image selection
+- Gemini comparison of visible changes
+- Trend result: `Improving`, `Worsening`, or `Unclear`
+- Confidence score
+- Summary
+- Suggested action
+- History saving
+
+The comparison prompt asks Gemini to choose `Unclear` when lighting, angle, focus, body part, or image quality makes comparison unreliable.
+
+### AI Health Chat
+
+The AI Health Chat uses Gemini for back-and-forth medical information support. It can help with:
+
+- Understanding symptoms
+- General self-care steps
+- Medicine safety questions
+- Common over-the-counter medicine categories
+- Questions to ask a doctor
+- Red flag symptoms that need urgent care
+
+The chatbot is instructed not to diagnose, prescribe, or give personalized dosage instructions.
+
 ## Configuration
+
+Add API keys to `local.properties` or environment variables. The app reads both.
 
 ### Firebase
 
-Create a Firebase project for package name `com.medvision.ai`, enable Email/Password authentication, and create a Firestore database.
+Create a Firebase project for package name:
 
-Add the following values to `local.properties` or your environment:
+```text
+com.medvision.ai
+```
+
+Enable Email/Password authentication and create a Firestore database.
 
 ```properties
 FIREBASE_API_KEY=your_firebase_api_key
@@ -72,23 +146,17 @@ FIREBASE_PROJECT_ID=your_project_id
 FIREBASE_STORAGE_BUCKET=your_storage_bucket
 ```
 
-If Firebase is not configured, the app falls back to local demo-friendly behavior for auth and history.
+Add your Firebase `google-services.json` file at:
 
-### OpenAI
-
-Add the following values to `local.properties` or your environment:
-
-```properties
-OPENAI_API_KEY=your_api_key_here
-OPENAI_MODEL=gpt-5-mini
-OPENAI_BASE_URL=https://api.openai.com/
+```text
+app/google-services.json
 ```
 
-If no API key is provided, the symptom checker returns a sample response instead of calling the API.
+If Firebase is unavailable, the app falls back to local demo-friendly auth/history behavior.
 
 ### Gemini
 
-Image scanning uses Google AI Studio / Gemini:
+Gemini powers image scan, scan comparison, and AI Health Chat.
 
 ```properties
 GEMINI_API_KEY=your_gemini_api_key_here
@@ -96,30 +164,63 @@ GEMINI_MODEL=gemini-2.5-flash
 GEMINI_BASE_URL=https://generativelanguage.googleapis.com/
 ```
 
+### OpenAI
+
+The symptom checker repository supports OpenAI Responses API.
+
+```properties
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-5-mini
+OPENAI_BASE_URL=https://api.openai.com/
+```
+
 ## Build And Run
 
 1. Open the project in Android Studio.
 2. Let Gradle sync dependencies.
 3. Make sure Android SDK 34 is installed.
-4. Connect a device or start an emulator.
-5. Run the `app` module.
+4. Add API keys in `local.properties` if you want live AI/Firebase behavior.
+5. Connect a device or start an emulator.
+6. Run the `app` module.
 
-## Main Screens
+Command-line build:
 
-- Authentication: login and signup flow
-- Home: quick access to symptom analysis, scan, and history
-- Symptom Checker: AI-generated possible conditions, risk level, and advice
-- Scan Disease: capture an image and run on-device visual analysis
-- Health History: view previous symptom checks and scans
-- Settings: dark mode, logout, and app info
+```powershell
+.\gradlew.bat :app:assembleDebug
+```
 
-## Important Notes
+## 16 KB Page-Size Support
 
-- The symptom checker does not provide a diagnosis.
-- The current image analysis uses ML Kit as a lightweight placeholder.
-- For production-grade disease detection, replace the detection pipeline with a trained TensorFlow Lite model.
-- Google Sign-In is not implemented yet, but the architecture is ready to extend.
+The project is configured to support Android devices with 16 KB memory pages.
+
+Relevant details:
+
+- Android Gradle Plugin: `8.5.2`
+- CameraX upgraded to `1.4.2`
+- Unused ML Kit image labeling dependency removed
+- Packaged native libraries were verified with `LOAD_ALIGN=[16384...]`
+
+This avoids Android Studio warnings such as:
+
+```text
+does not support 16KB device
+```
+
+## Theme Support
+
+The app supports both dark mode and light mode.
+
+The shared background, glass cards, buttons, navigation bar, chat bubbles, and system bars are theme-aware. In light mode, the status bar uses dark icons so battery, time, and notification icons remain visible.
+
+## Safety Notes
+
+- MedVision AI does not diagnose disease.
+- MedVision AI does not prescribe medicine.
+- Medicine suggestions are general information only.
+- Users should follow package labels or clinician/pharmacist advice.
+- The app should recommend urgent care for red flags such as chest pain, trouble breathing, stroke symptoms, severe allergic reaction, fainting, suicidal thoughts, severe dehydration, or rapidly worsening symptoms.
+- Image analysis can be affected by lighting, focus, camera angle, and image quality.
 
 ## Disclaimer
 
-This app provides general health insights and is not a substitute for professional medical advice.
+MedVision AI provides general health insights and educational information only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional for medical concerns.
