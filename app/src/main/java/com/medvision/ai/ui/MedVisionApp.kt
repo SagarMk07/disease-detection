@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -89,7 +90,7 @@ fun MedVisionApp(application: Application) {
                         val currentDestination = backStackEntry?.destination
                         val showBottomBar = currentDestination?.route in items.map { it.route }
                         if (showBottomBar) {
-                            NavigationBar(containerColor = androidx.compose.ui.graphics.Color(0x2219224A)) {
+                            NavigationBar(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f)) {
                                 items.forEach { item ->
                                     NavigationBarItem(
                                         selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,

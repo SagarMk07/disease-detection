@@ -23,7 +23,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.medvision.ai.data.model.APP_DISCLAIMER
@@ -47,7 +46,7 @@ fun HomeScreen(
         Triple("AI Health Chat", Icons.Default.Chat, onOpenChat),
         Triple("Health History", Icons.Default.MonitorHeart, onOpenHistory)
     )
-    val accent by animateColorAsState(targetValue = Color(0xFF86D8FF), label = "accent")
+    val accent by animateColorAsState(targetValue = MaterialTheme.colorScheme.primary, label = "accent")
 
     LazyColumn(
         modifier = Modifier
@@ -102,7 +101,7 @@ private fun GlassActionCard(
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = Color(0xFF9BDBFF)
+                tint = MaterialTheme.colorScheme.primary
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)

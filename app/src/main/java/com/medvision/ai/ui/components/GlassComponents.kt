@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
@@ -42,17 +43,31 @@ import com.medvision.ai.R
 
 @Composable
 fun GradientBackground(content: @Composable () -> Unit) {
+    val colorScheme = MaterialTheme.colorScheme
+    val isDark = colorScheme.background.luminance() < 0.5f
+    val gradientColors = if (isDark) {
+        listOf(
+            Color(0xFF050816),
+            Color(0xFF101B42),
+            Color(0xFF20104D),
+            Color(0xFF050816)
+        )
+    } else {
+        listOf(
+            Color(0xFFF7FAFF),
+            Color(0xFFEAF4FF),
+            Color(0xFFF4F0FF),
+            Color(0xFFFFFFFF)
+        )
+    }
+    val glowColor = if (isDark) Color(0xFF65C7F7) else Color(0xFFB9E3FF)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFF050816),
-                        Color(0xFF101B42),
-                        Color(0xFF20104D),
-                        Color(0xFF050816)
-                    )
+                    colors = gradientColors
                 )
             )
     ) {
@@ -63,7 +78,7 @@ fun GradientBackground(content: @Composable () -> Unit) {
                 .blur(60.dp)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(Color(0xFF65C7F7), Color.Transparent),
+                        colors = listOf(glowColor, Color.Transparent),
                         radius = 900f
                     )
                 )
@@ -77,15 +92,20 @@ fun GlassCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val isDark = colorScheme.background.luminance() < 0.5f
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.14f) else Color(0xFF8EA4C8).copy(alpha = 0.26f)
+    val containerColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.White.copy(alpha = 0.78f)
+
     Card(
         modifier = modifier
             .border(
-                BorderStroke(1.dp, Color.White.copy(alpha = 0.14f)),
+                BorderStroke(1.dp, borderColor),
                 RoundedCornerShape(28.dp)
             ),
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.08f)
+            containerColor = containerColor
         )
     ) {
         content()
@@ -132,8 +152,8 @@ fun PrimaryActionButton(
         modifier = modifier.fillMaxWidth(),
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF61C3FF).copy(alpha = alpha.value),
-            contentColor = Color(0xFF031324)
+            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = alpha.value),
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -148,7 +168,7 @@ fun DisclaimerBanner(text: String) {
             text = text,
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodySmall,
-            color = Color(0xFFE0EAFF)
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

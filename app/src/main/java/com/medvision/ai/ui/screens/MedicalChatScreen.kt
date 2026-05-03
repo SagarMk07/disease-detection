@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.medvision.ai.data.model.APP_DISCLAIMER
@@ -109,8 +110,17 @@ fun MedicalChatScreen(
 @Composable
 private fun ChatBubble(message: MedicalChatTurn) {
     val alignment = if (message.isUser) Alignment.CenterEnd else Alignment.CenterStart
-    val bubbleColor = if (message.isUser) Color(0xFF61C3FF) else Color.White.copy(alpha = 0.10f)
-    val textColor = if (message.isUser) Color(0xFF031324) else MaterialTheme.colorScheme.onSurface
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val bubbleColor = when {
+        message.isUser -> MaterialTheme.colorScheme.primary
+        isDark -> Color.White.copy(alpha = 0.10f)
+        else -> MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
+    }
+    val textColor = if (message.isUser) {
+        MaterialTheme.colorScheme.onPrimary
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
 
     Box(
         modifier = Modifier.fillMaxWidth(),
